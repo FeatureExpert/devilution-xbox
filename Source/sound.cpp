@@ -86,6 +86,7 @@ static LPDIRECTSOUNDBUFFER sound_dup_channel(LPDIRECTSOUNDBUFFER DSB)
 		return NULL;
 	}
 
+#if !_XBOX
 	for (i = 0; i < 8; i++) {
 		if (!DSBs[i]) {
 			if (sglpDS->DuplicateSoundBuffer(DSB, &DSBs[i]) != DS_OK) {
@@ -95,6 +96,7 @@ static LPDIRECTSOUNDBUFFER sound_dup_channel(LPDIRECTSOUNDBUFFER DSB)
 			return DSBs[i];
 		}
 	}
+#endif
 
 	return NULL;
 }
@@ -206,17 +208,26 @@ void snd_play_snd(TSnd *pSnd, int lVolume, int lPan)
 		lVolume = VOLUME_MAX;
 	}
 	DSB->SetVolume(lVolume);
+#if !_XBOX
+	// TODO: figure out how to convince the Xbox to do panning
 	DSB->SetPan(lPan);
+#endif
 
 	error_code = DSB->Play(0, 0, 0);
 
+#if !_XBOX
 	if (error_code != DSERR_BUFFERLOST) {
+#endif
 		if (error_code != DS_OK) {
 			DSErrMsg(error_code, 261, "C:\\Src\\Diablo\\Source\\SOUND.CPP");
 		}
+#if !_XBOX
 	} else if (sound_file_reload(pSnd, DSB)) {
+#endif
 		DSB->Play(0, 0, 0);
+#if !_XBOX
 	}
+#endif
 
 	pSnd->start_tc = tc;
 }
@@ -228,7 +239,11 @@ static void sound_CreateSoundBuffer(TSnd *sound_file)
 	memset(&DSB, 0, sizeof(DSBUFFERDESC));
 
 	DSB.dwSize = sizeof(DSBUFFERDESC);
+#if _XBOX
+	DSB.dwFlags = DSBCAPS_CTRLVOLUME;
+#else
 	DSB.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_STATIC;
+#endif
 	DSB.dwBufferBytes = sound_file->chunk.dwSize;
 	DSB.lpwfxFormat = &sound_file->fmt;
 	error_code = sglpDS->CreateSoundBuffer(&DSB, &sound_file->DSB, NULL);
@@ -298,7 +313,9 @@ static void sound_create_primary_buffer(HANDLE music_track)
 	if (music_track == NULL) {
 		memset(&dsbuf, 0, sizeof(DSBUFFERDESC));
 		dsbuf.dwSize = sizeof(DSBUFFERDESC);
+#if !_XBOX
 		dsbuf.dwFlags = DSBCAPS_PRIMARYBUFFER;
+#endif
 
 		error_code = sglpDS->CreateSoundBuffer(&dsbuf, &sglpDSB, NULL);
 		if (error_code != DS_OK)
@@ -307,7 +324,9 @@ static void sound_create_primary_buffer(HANDLE music_track)
 
 	if (sglpDSB) {
 		DSCAPS dsbcaps;
+#if !_XBOX
 		dsbcaps.dwSize = sizeof(DSCAPS);
+#endif
 
 		error_code = sglpDS->GetCaps(&dsbcaps);
 		if (error_code != DS_OK)
@@ -331,6 +350,7 @@ static void sound_create_primary_buffer(HANDLE music_track)
 
 static HRESULT sound_DirectSoundCreate(LPGUID lpGuid, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter)
 {
+#if !_XBOX
 	HRESULT(WINAPI * DirectSoundCreate)
 	(LPGUID lpGuid, LPDIRECTSOUND * ppDS, LPUNKNOWN pUnkOuter);
 
@@ -345,6 +365,7 @@ static HRESULT sound_DirectSoundCreate(LPGUID lpGuid, LPDIRECTSOUND *ppDS, LPUNK
 	if (DirectSoundCreate == NULL) {
 		ErrDlg(IDD_DIALOG5, GetLastError(), "C:\\Src\\Diablo\\Source\\SOUND.CPP", 427);
 	}
+#endif
 	return DirectSoundCreate(lpGuid, ppDS, pUnkOuter);
 }
 

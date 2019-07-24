@@ -75,6 +75,7 @@ static void dx_create_primary_surface()
 
 static HRESULT dx_DirectDrawCreate(LPGUID guid, LPDIRECTDRAW *lplpDD, LPUNKNOWN pUnkOuter)
 {
+#if !_XBOX
 	HRESULT(WINAPI * DirectDrawCreate)
 	(LPGUID lpGuid, LPDIRECTDRAW * lplpDD, LPUNKNOWN pUnkOuter);
 
@@ -89,6 +90,7 @@ static HRESULT dx_DirectDrawCreate(LPGUID guid, LPDIRECTDRAW *lplpDD, LPUNKNOWN 
 	if (DirectDrawCreate == NULL) {
 		ErrDlg(IDD_DIALOG4, GetLastError(), "C:\\Src\\Diablo\\Source\\dx.cpp", 127);
 	}
+#endif
 	return DirectDrawCreate(guid, lplpDD, pUnkOuter);
 }
 

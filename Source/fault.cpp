@@ -282,7 +282,9 @@ LONG __stdcall TopLevelExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	    ctx->Edi);
 	log_printf("CS:EIP:%04X:%08X\r\n", ctx->SegCs, ctx->Eip);
 	log_printf("SS:ESP:%04X:%08X EBP:%08X\r\n", ctx->SegSs, ctx->Esp, ctx->Ebp);
+#if !_XBOX
 	log_printf("DS:%04X ES:%04X FS:%04X GS:%04X\r\n", ctx->SegDs, ctx->SegEs, ctx->SegFs, ctx->SegGs);
+#endif
 
 	log_printf("Flags:%08X\r\n", ctx->EFlags);
 	fault_call_stack((void *)ctx->Eip, (STACK_FRAME *)ctx->Ebp);

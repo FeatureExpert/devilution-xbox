@@ -27,10 +27,14 @@ static void pfile_check_available_space(char *pszDir)
 {
 	char *s;
 	BOOL hasSpace;
+#if _XBOX
+	ULARGE_INTEGER freeBytesAvailable;
+#else
 	DWORD TotalNumberOfClusters;
 	DWORD NumberOfFreeClusters;
 	DWORD BytesPerSector;
 	DWORD SectorsPerCluster;
+#endif
 
 	s = pszDir;
 	while (*s) {
@@ -40,12 +44,22 @@ static void pfile_check_available_space(char *pszDir)
 		break;
 	}
 
+#if _XBOX
+	hasSpace = GetDiskFreeSpaceEx(pszDir, &freeBytesAvailable, NULL, NULL);
+	if (hasSpace) {
+		// 10MB is the amount hardcoded in the error dialog
+		if (freeBytesAvailable.QuadPart < (__int64)(10 << 20)) {
+			hasSpace = FALSE;
+		}
+	}
+#else
 	hasSpace = GetDiskFreeSpace(pszDir, &SectorsPerCluster, &BytesPerSector, &NumberOfFreeClusters, &TotalNumberOfClusters);
 	if (hasSpace) {
 		// 10MB is the amount hardcoded in the error dialog
 		if ((__int64)SectorsPerCluster * BytesPerSector * NumberOfFreeClusters < (__int64)(10 << 20))
 			hasSpace = FALSE;
 	}
+#endif
 
 	if (!hasSpace)
 		DiskFreeDlg(pszDir);

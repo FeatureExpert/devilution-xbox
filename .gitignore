@@ -26,6 +26,11 @@ comparer-config.toml
 # PE executable.
 *.exe
 
+# Xbox build outputs
+*.xbe
+xbelogo/*.h
+xbelogo/*.xbx
+
 # GCC dependency file.
 *.d
 

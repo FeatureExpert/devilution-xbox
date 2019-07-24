@@ -1000,7 +1000,7 @@ void MakeLightTable()
 		for (i = 0; i < 8; i++) {
 			for (k = 0; k < 16; k++) {
 				for (l = 0; l < 16; l++) {
-					fs = (BYTE)sqrt((8 * l - j) * (8 * l - j) + (8 * k - i) * (8 * k - i));
+					fs = (BYTE)sqrt((double)(8 * l - j) * (8 * l - j) + (8 * k - i) * (8 * k - i));
 					fs += fs < 0 ? -0.5 : 0.5;
 
 					lightblock[j * 8 + i][k][l] = fs;

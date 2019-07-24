@@ -383,21 +383,25 @@ static void TraceErrorDS(HRESULT hError, char *pszBuffer, DWORD dwMaxChars)
 	const char *szError;
 
 	switch (hError) {
+#if !_XBOX
 	case DSERR_PRIOLEVELNEEDED:
 		szError = "DSERR_PRIOLEVELNEEDED";
 		break;
 	case DSERR_BADFORMAT:
 		szError = "DSERR_BADFORMAT";
 		break;
+#endif
 	case DSERR_NODRIVER:
 		szError = "DSERR_NODRIVER";
 		break;
+#if !_XBOX
 	case DSERR_ALREADYINITIALIZED:
 		szError = "DSERR_ALREADYINITIALIZED";
 		break;
 	case DSERR_BUFFERLOST:
 		szError = "DSERR_BUFFERLOST";
 		break;
+#endif
 	case DS_OK:
 		szError = "DS_OK";
 		break;
@@ -413,12 +417,14 @@ static void TraceErrorDS(HRESULT hError, char *pszBuffer, DWORD dwMaxChars)
 	case DSERR_OUTOFMEMORY:
 		szError = "DSERR_OUTOFMEMORY";
 		break;
+#if !_XBOX
 	case DSERR_INVALIDPARAM:
 		szError = "DSERR_INVALIDPARAM";
 		break;
 	case DSERR_ALLOCATED:
 		szError = "DSERR_ALLOCATED";
 		break;
+#endif
 	case DSERR_CONTROLUNAVAIL:
 		szError = "DSERR_CONTROLUNAVAIL";
 		break;
