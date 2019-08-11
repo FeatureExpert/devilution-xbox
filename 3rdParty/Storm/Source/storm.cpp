@@ -61,9 +61,6 @@ BOOL STORMAPI SDlgSetBitmapE(HWND hWnd, int a2, char *src, int mask1, int flags,
 
 int STORMAPI Ordinal224(int a1) rInt;
 
-BOOL STORMAPI SFileCloseArchive(HANDLE hArchive) rBool;
-BOOL STORMAPI SFileCloseFile(HANDLE hFile) rBool;
-
 BOOL STORMAPI SFileDdaBeginEx(HANDLE hFile, DWORD flags, DWORD mask, unsigned __int32 lDistanceToMove, signed __int32 volume, signed int a6, int a7) rBool;
 BOOL STORMAPI SFileDdaDestroy() rBool;
 BOOL STORMAPI SFileDdaEnd(HANDLE hFile) rBool;
@@ -71,24 +68,6 @@ BOOL STORMAPI SFileDdaGetPos(HANDLE hFile, DWORD *current, DWORD *end) rBool;
 
 BOOL STORMAPI SFileDdaInitialize(HANDLE directsound) rBool;
 BOOL STORMAPI SFileDdaSetVolume(HANDLE hFile, signed int bigvolume, signed int volume) rBool;
-BOOL STORMAPI SFileDestroy() rBool;
-
-BOOL STORMAPI SFileGetFileArchive(HANDLE hFile, HANDLE *archive) rBool;
-LONG STORMAPI SFileGetFileSize(HANDLE hFile, LPDWORD lpFileSizeHigh) rInt;
-BOOL STORMAPI SFileOpenArchive(const char *szMpqName, DWORD dwPriority, DWORD dwFlags, HANDLE *phMpq) rBool;
-BOOL STORMAPI SFileOpenFile(const char *filename, HANDLE *phFile) rBool;
-BOOL STORMAPI SFileOpenFileEx(HANDLE hMpq, const char *szFileName, DWORD dwSearchScope, HANDLE *phFile) rBool;
-BOOL STORMAPI SFileReadFile(HANDLE hFile, void *buffer, DWORD nNumberOfBytesToRead, DWORD *read, LONG *lpDistanceToMoveHigh) rBool;
-
-void STORMAPI SFileSetLocale(LCID lcLocale) rVoid;
-
-BOOL STORMAPI SFileSetIoErrorMode(int mode, BOOL (STORMAPI *callback)(char*,int,int) ) rBool;
-BOOL STORMAPI SFileGetArchiveName(HANDLE hArchive, char *name, int length) rBool;
-BOOL STORMAPI SFileGetFileName(HANDLE hFile, char *buffer, int length) rBool;
-
-BOOL STORMAPI SFileLoadFile(char *filename, void *buffer, int buffersize, int a4, int a5) rBool;
-BOOL STORMAPI SFileUnloadFile(HANDLE hFile) rBool;
-BOOL STORMAPI SFileLoadFileEx(void *hArchive, char *filename, int a3, int a4, int a5, DWORD searchScope, struct _OVERLAPPED *lpOverlapped) rBool;
 
 BOOL STORMAPI SBltROP3(void *lpDstBuffer, void *lpSrcBuffer, int width, int height, int a5, int a6, int a7, DWORD rop) rBool;
 BOOL STORMAPI SBltROP3Clipped(void *lpDstBuffer, RECT *lpDstRect, POINT *lpDstPt, int a4, void *lpSrcBuffer, RECT *lpSrcRect, POINT *lpSrcPt, int a8, int a9, DWORD rop) rBool;
@@ -227,7 +206,6 @@ int STORMAPI SBigToBinaryBuffer(void *buffer, int length, int a3, int a4) rInt;
 void __stdcall SDrawMessageBox(const char *,const char *,int) rVoid;
 void __cdecl SDrawDestroy(void) rVoid;
 BOOLEAN __cdecl StormDestroy(void) rBool;
-BOOL __stdcall SFileSetBasePath(const char *) rBool;
 void __cdecl SDrawRealizePalette(void) rVoid;
 BOOL __cdecl SVidPlayContinue(void) rBool;
 BOOL __stdcall SNetGetOwnerTurnsWaiting(DWORD *) rBool;
@@ -236,7 +214,6 @@ BOOL __stdcall SNetRegisterEventHandler(int,SEVTHANDLER) rPVoid;
 BOOLEAN __stdcall SNetSetBasePlayer(int) rBool;
 int __stdcall SNetInitializeProvider(unsigned long,struct _SNETPROGRAMDATA *,struct _SNETPLAYERDATA *,struct _SNETUIDATA *,struct _SNETVERSIONDATA *) rInt;
 int __stdcall SNetGetProviderCaps(struct _SNETCAPS *) rInt;
-int __stdcall SFileSetFilePointer(HANDLE,int,HANDLE,int) rInt;
 void __stdcall SDrawClearSurface(int a1) rVoid;
 BOOL __stdcall SDlgSetBitmapI(HWND hWnd, int a2, char *src, int mask1, int flags, void *pBuff, int a7, int width, int height, int mask2) rBool;
 void __stdcall SDlgBeginPaint(HWND hWnd, char *a2) rVoid;
@@ -248,4 +225,3 @@ BOOL __stdcall SDlgKillTimer(int a1, int a2) rBool;
 BOOL __stdcall SDlgDrawBitmap(HWND hWnd, int a2, int a3, int a4, int a5, int a6, int a7) rBool;
 BOOL __stdcall SDlgDialogBoxParam(HINSTANCE hInst, char *szDialog, int hWnd, WNDPROC func, int selhero_is_good) rBool;
 BOOL __stdcall SGdiTextOut(void *pBuffer, int x, int y, int mask, char *str, int len) rBool;
-BOOL __stdcall SFileEnableDirectAccess(BOOL enable) rBool;

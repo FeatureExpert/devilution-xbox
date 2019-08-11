@@ -539,7 +539,7 @@ enum SFileFlags
   SFILE_FROM_DISK     = 0x00000004
 };
 
-BOOL STORMAPI SFileReadFile(HANDLE hFile, void *buffer, DWORD nNumberOfBytesToRead, DWORD *read, LONG *lpDistanceToMoveHigh);
+BOOL STORMAPI SFileReadFile(HANDLE hFile, void *buffer, DWORD nNumberOfBytesToRead, DWORD *read, LPOVERLAPPED lpOverlapped);
 
 void STORMAPI SFileSetLocale(LCID lcLocale);
 
@@ -1332,7 +1332,7 @@ BOOL __stdcall SNetRegisterEventHandler(int,SEVTHANDLER);
 BOOLEAN __stdcall SNetSetBasePlayer(int);
 int __stdcall SNetInitializeProvider(unsigned long,struct _SNETPROGRAMDATA *,struct _SNETPLAYERDATA *,struct _SNETUIDATA *,struct _SNETVERSIONDATA *);
 int __stdcall SNetGetProviderCaps(struct _SNETCAPS *);
-int __stdcall SFileSetFilePointer(HANDLE,int,HANDLE,int);
+DWORD STORMAPI SFileSetFilePointer(HANDLE hFile, LONG lFilePos, HANDLE plFilePosHigh, DWORD dwMoveMethod); // use HANDLE for compatibility with wave.cpp
 void __stdcall SDrawClearSurface(int a1);
 BOOL __stdcall SDlgSetBitmapI(HWND hWnd, int a2, char *src, int mask1, int flags, void *pBuff, int a7, int width, int height, int mask2);
 void __stdcall SDlgBeginPaint(HWND hWnd, char *a2);
