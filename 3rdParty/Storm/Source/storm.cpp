@@ -113,12 +113,6 @@ BOOL STORMAPI SGdiSetPitch(int pitch) rBool;
 
 BOOL STORMAPI Ordinal393(char *string, int, int) rBool;
 
-void *STORMAPI SMemAlloc(size_t amount, const char *logfilename, int logline, int defaultValue) rPVoid;
-
-BOOL STORMAPI SMemFree(void *location, const char *logfilename, int logline, char defaultValue) rBool;
-
-void* STORMAPI SMemReAlloc(void *location, size_t amount, const char *logfilename, int logline, char defaultValue) rPVoid;
-
 BOOL STORMAPI SRegLoadData(const char *keyname, const char *valuename, int size, LPBYTE lpData, BYTE flags, LPDWORD lpcbData) rBool;
 BOOL STORMAPI SRegLoadString(const char *keyname, const char *valuename, BYTE flags, char *buffer, size_t buffersize) rBool;
 BOOL STORMAPI SRegLoadValue(const char *keyname, const char *valuename, BYTE flags, int *value) rBool;
@@ -160,12 +154,6 @@ DWORD STORMAPI SErrGetLastError() rInt;
 void STORMAPI SErrSetLastError(DWORD dwErrCode) rVoid;
 
 void STORMAPI SErrSuppressErrors(BOOL suppressErrors) rVoid;
-
-void STORMAPI SMemCopy(void *dest, const void *source, size_t size) rVoid;
-void STORMAPI SMemFill(void *location, size_t length, char fillWith) rVoid;
-
-void STORMAPI SMemZero(void *location, DWORD length) rVoid;
-int  STORMAPI SMemCmp(void *location1, void *location2, DWORD size) rInt;
 
 int   STORMAPI SStrCopy(char *dest, const char *src, int max_length) rInt;
 DWORD STORMAPI SStrHash(const char *string, DWORD flags, DWORD Seed) rInt;
