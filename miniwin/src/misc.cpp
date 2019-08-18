@@ -8,6 +8,7 @@
 #include <assert.h>
 
 extern LD_LAUNCH_DASHBOARD launchDashboard;
+extern void DebugPrintf(const char * fmt, ...);
 
 #define MAX_LINE_LENGTH    80
 static BOOL read_line(FILE * fp, char *bp);
@@ -257,6 +258,8 @@ WINBASEAPI DWORD WINAPI GetLogicalDriveStringsW(IN DWORD nBufferLength, OUT LPWS
 
 WINBASEAPI DWORD WINAPI GetModuleFileNameA(IN HMODULE hModule, OUT LPSTR lpFilename, IN DWORD nSize)
 {
+	DebugPrintf("GetModuleFileNameA(0x%p, 0x%p, %u)\n", hModule, lpFilename, nSize);
+
 	DWORD result;
 
 	if (hModule == NULL) {
@@ -281,6 +284,8 @@ WINBASEAPI DWORD WINAPI GetModuleFileNameW(IN HMODULE hModule, OUT LPWSTR lpFile
 
 WINBASEAPI HMODULE WINAPI GetModuleHandleA(IN LPCSTR lpModuleName)
 {
+	DebugPrintf("GetModuleHandleA(\"%s\")\n", lpModuleName);
+
 	// TODO: implement
 	return NULL;
 }
@@ -375,6 +380,8 @@ WINBASEAPI VOID WINAPI GetSystemInfo(OUT LPSYSTEM_INFO lpSystemInfo)
 
 WINUSERAPI int WINAPI GetSystemMetrics(IN int nIndex)
 {
+	DebugPrintf("GetSystemMetrics(%i)\n", nIndex);
+
 	switch(nIndex)
 	{
 	case SM_CMONITORS:

@@ -3,6 +3,8 @@
 
 #include <map>
 
+extern void DebugPrintf(const char * fmt, ...);
+
 WNDPROC _currentWndProc;
 static std::map<HWND, std::map<LPCSTR, HANDLE> > _wndProps;
 
@@ -20,6 +22,21 @@ WINUSERAPI LRESULT WINAPI CallWindowProcW(IN WNDPROC lpPrevWndFunc, IN HWND hWnd
 
 WINUSERAPI HWND WINAPI CreateWindowExA(IN DWORD dwExStyle, IN LPCSTR lpClassName, IN LPCSTR lpWindowName, IN DWORD dwStyle, IN int X, IN int Y, IN int nWidth, IN int nHeight, IN HWND hWndParent, IN HMENU hMenu, IN HINSTANCE hInstance, IN LPVOID lpParam)
 {
+	DebugPrintf(
+		"CreateWindowExA(0x%08X, \"%s\", \"%s\", 0x%08X, %i, %i, %i, %i, %p, %p, %p, %p)\n",
+		dwExStyle,
+		lpClassName,
+		lpWindowName,
+		dwStyle,
+		X,
+		Y,
+		nWidth,
+		nHeight,
+		hWndParent,
+		hMenu,
+		hInstance,
+		lpParam);
+
 	// TODO: implement
 
 	return (HWND)1;
@@ -196,6 +213,13 @@ WINUSERAPI BOOL WINAPI IsWindowVisible(IN HWND hWnd)
 
 WINUSERAPI ATOM WINAPI RegisterClassA(IN CONST WNDCLASSA *lpWndClass)
 {
+	DebugPrintf(
+		"RegisterClassA(%p)\n    WNDCLASSA.lpszClassName: %s\n    WNDCLASSA.style: 0x%X\n    WNDCLASSA.lpfnWndProc: %p\n",
+		lpWndClass,
+		lpWndClass->lpszClassName,
+		lpWndClass->style,
+		lpWndClass->lpfnWndProc);
+
 	// TODO: implement
 	return 0;
 }
@@ -308,6 +332,16 @@ WINUSERAPI LONG WINAPI SetWindowLongW(IN HWND hWnd, IN int nIndex, IN LONG dwNew
 
 WINUSERAPI BOOL WINAPI SetWindowPos(IN HWND hWnd, IN HWND hWndInsertAfter, IN int X, IN int Y, IN int cx, IN int cy, IN UINT uFlags)
 {
+	DebugPrintf(
+		"SetWindowPos(0x%p, 0x%p, %i, %i, %i, %i, %u)\n",
+		hWnd,
+		hWndInsertAfter,
+		X,
+		Y,
+		cx,
+		cy,
+		uFlags);
+
 	return TRUE;
 }
 
@@ -323,6 +357,8 @@ WINUSERAPI BOOL WINAPI SetWindowTextW(IN HWND hWnd, IN LPCWSTR lpString)
 
 WINUSERAPI BOOL WINAPI ShowWindow(IN HWND hWnd, IN int nCmdShow)
 {
+	DebugPrintf("ShowWindow(0x%p, 0x%X)\n", hWnd, nCmdShow);
+
 	if (nCmdShow == SW_HIDE) {
 		_currentWndProc(hWnd, WM_SHOWWINDOW, FALSE, 0);
 	} else if (nCmdShow == SW_SHOWNORMAL) {
@@ -334,5 +370,7 @@ WINUSERAPI BOOL WINAPI ShowWindow(IN HWND hWnd, IN int nCmdShow)
 
 WINUSERAPI BOOL WINAPI UpdateWindow(IN HWND hWnd)
 {
+	DebugPrintf("UpdateWindow(0x%p)\n", hWnd);
+
 	return TRUE;
 }

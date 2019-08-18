@@ -3,6 +3,8 @@
 extern BOOL __stdcall DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved);
 extern int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 
+extern void DebugPrintf(const char * fmt, ...);
+
 LD_LAUNCH_DASHBOARD launchDashboard;
 LAUNCH_DATA launchData;
 IDirect3DDevice8 * d3dDevice;
@@ -56,11 +58,19 @@ void _cdecl main(void)
 		}
 	}
 
+	DebugPrintf("Starting DiabloUI\n");
+
 	// fire up DiabloUI
 	DllMain(NULL, 1, NULL);
 
+	DebugPrintf("Started DiabloUI\n");
+
+	DebugPrintf("Starting Diablo\n");
+
 	// Diablo entry point
 	WinMain(NULL, NULL, szCmdLine, 0);
+
+	DebugPrintf("Exiting to Dashboard\n");
 
 	// return to the dashboard
 	launchDashboard.dwReason = XLD_LAUNCH_DASHBOARD_MAIN_MENU;

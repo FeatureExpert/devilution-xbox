@@ -3,6 +3,8 @@
 
 extern WNDPROC _currentWndProc;
 
+extern void DebugPrintf(const char * fmt, ...);
+
 WINUSERAPI HDC WINAPI BeginPaint(IN HWND hWnd, OUT LPPAINTSTRUCT lpPaint)
 {
 	// TODO: implement
@@ -115,6 +117,8 @@ WINUSERAPI HWND WINAPI GetNextDlgGroupItem(IN HWND hDlg, IN HWND hCtl, IN BOOL b
 
 WINUSERAPI BOOL WINAPI InvalidateRect(IN HWND hWnd, IN CONST RECT *lpRect, IN BOOL bErase)
 {
+	DebugPrintf("InvalidateRect(0x%p, 0x%p, %s)\n", hWnd, lpRect, bErase ? "true" : "false");
+
 	// TODO: implement
 	return TRUE;
 }
@@ -169,6 +173,8 @@ WINUSERAPI int WINAPI LoadStringW(IN HINSTANCE hInstance, IN UINT uID, OUT LPWST
 
 WINUSERAPI int WINAPI MessageBoxA(IN HWND hWnd, IN LPCSTR lpText, IN LPCSTR lpCaption, IN UINT uType)
 {
+	DebugPrintf("MessageBoxA(0x%p, \"%s\", \"%s\", 0x%08X)\n", hWnd, lpText, lpCaption, uType);
+
 	// TODO: implement
 	return 0;
 }

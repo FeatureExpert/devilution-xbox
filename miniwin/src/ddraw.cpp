@@ -1,6 +1,7 @@
 #include <ddraw.h>
 
 extern IDirect3DDevice8 * d3dDevice;
+extern void DebugPrintf(const char * fmt, ...);
 
 /** Currently active palette */
 IDirect3DPalette8 * systemPalette;
@@ -144,21 +145,38 @@ HRESULT WINAPI DirectDrawCreate(GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD, IUnk
 
 ULONG STDMETHODCALLTYPE DirectDrawImpl::AddRef()
 {
+	DebugPrintf("DirectDrawImpl::AddRef()\n");
+
 	return 1;
 }
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::Compact()
 {
+	DebugPrintf("DirectDrawImpl::Compact()\n");
+
 	return DD_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::CreateClipper(DWORD dwFlags, LPDIRECTDRAWCLIPPER FAR *lplpDDClipper, IUnknown FAR *pUnkOuter)
 {
+	DebugPrintf(
+		"DirectDrawImpl::CreateClipper(0x%08X, %p, %p)\n",
+		dwFlags,
+		lplpDDClipper,
+		pUnkOuter);
+
 	return DD_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::CreatePalette(DWORD dwFlags, LPPALETTEENTRY lpColorTable, LPDIRECTDRAWPALETTE *lplpDDPalette, IUnknown *pUnkOuter)
 {
+	DebugPrintf(
+		"DirectDrawImpl::CreatePalette(0x%08X, 0x%p, 0x%p, 0x%p)\n",
+		dwFlags,
+		lpColorTable,
+		lplpDDPalette,
+		pUnkOuter);
+
 	*lplpDDPalette = new DirectDrawPaletteImpl();
 
 	return d3dDevice->CreatePalette(D3DPALETTE_256, &((DirectDrawPaletteImpl *)(*lplpDDPalette))->palette);
@@ -166,6 +184,8 @@ HRESULT STDMETHODCALLTYPE DirectDrawImpl::CreatePalette(DWORD dwFlags, LPPALETTE
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::CreateSurface(LPDDSURFACEDESC lpDDSurfaceDesc, LPDIRECTDRAWSURFACE *lplpDDSurface, IUnknown *pUnkOuter)
 {
+	DebugPrintf("DirectDrawImpl::CreateSurface(0x%p, 0x%p, 0x%p)\n", lpDDSurfaceDesc, lplpDDSurface, pUnkOuter);
+
 	if (lpDDSurfaceDesc == NULL || lplpDDSurface == NULL) {
 		return DDERR_INVALIDPARAMS;
 	}
@@ -269,11 +289,15 @@ HRESULT STDMETHODCALLTYPE DirectDrawImpl::RestoreDisplayMode()
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::SetCooperativeLevel(HWND hWnd, DWORD dwFlags)
 {
+	DebugPrintf("DirectDrawImpl::SetCooperativeLevel(0x%p, 0x%08X)\n", hWnd, dwFlags);
+
 	return DD_OK;
 }
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::SetDisplayMode(DWORD dwWidth, DWORD dwHeight, DWORD dwBPP)
 {
+	DebugPrintf("DirectDrawImpl::SetDisplayMode(%u, %u, %u)\n", dwWidth, dwHeight, dwBPP);
+
 	width = dwWidth;
 	height = dwHeight;
 
@@ -282,6 +306,8 @@ HRESULT STDMETHODCALLTYPE DirectDrawImpl::SetDisplayMode(DWORD dwWidth, DWORD dw
 
 HRESULT STDMETHODCALLTYPE DirectDrawImpl::WaitForVerticalBlank(DWORD dwFlags, HANDLE hWnd)
 {
+	DebugPrintf("DirectDrawImpl::WaitForVerticalBlank(0x%08X, 0x%p)\n", dwFlags, hWnd);
+
 	// TODO: implement
 
 	return DD_OK;
@@ -370,6 +396,8 @@ HRESULT STDMETHODCALLTYPE DirectDrawPaletteImpl::SetEntries(DWORD dwFlags, DWORD
 
 DirectDrawSurfaceImpl::DirectDrawSurfaceImpl(LPDDSURFACEDESC lpDDSurfaceDesc)
 {
+	DebugPrintf("DirectDrawSurfaceImpl::DirectDrawSurfaceImpl(0x%p)\n", lpDDSurfaceDesc);
+
 	isPrimary = lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE;
 
 	if (isPrimary) {
@@ -526,6 +554,10 @@ HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::GetPixelFormat(LPDDPIXELFORMAT 
 
 HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::GetSurfaceDesc(LPDDSURFACEDESC lpDDSurfaceDesc)
 {
+	DebugPrintf("DirectDrawSurfaceImpl::GetSurfaceDesc(0x%p)\n", lpDDSurfaceDesc);
+
+	// TODO: implement
+
 	return DD_OK;
 }
 
@@ -541,6 +573,13 @@ HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::IsLost()
 
 HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::Lock(LPRECT lpDestRect, LPDDSURFACEDESC lpDDSurfaceDesc, DWORD dwFlags, HANDLE hEvent)
 {
+	DebugPrintf(
+		"DirectDrawSurfaceImpl::Lock(0x%p, 0x%p, 0x%08X, 0x%p)\n",
+		lpDestRect,
+		lpDDSurfaceDesc,
+		dwFlags,
+		hEvent);
+
 	// TODO: see if we need to grant access to the actual back buffer when locking our primary buffer
 
 	if (!isPrimary) {
@@ -597,6 +636,8 @@ HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::SetOverlayPosition(LONG, LONG)
 
 HRESULT STDMETHODCALLTYPE DirectDrawSurfaceImpl::SetPalette(LPDIRECTDRAWPALETTE lpDDPalette)
 {
+	DebugPrintf("DirectDrawSurfaceImpl::SetPalette(0x%p)\n", lpDDPalette);
+
 	if (isPrimary) {
 		systemPalette = ((DirectDrawPaletteImpl *)lpDDPalette)->palette;
 	}

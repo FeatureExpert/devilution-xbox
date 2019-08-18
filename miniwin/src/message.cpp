@@ -8,6 +8,8 @@ static std::deque<MSG> message_queue;
 
 extern WNDPROC _currentWndProc;
 
+extern void DebugPrintf(const char * fmt, ...);
+
 WINUSERAPI LRESULT WINAPI DispatchMessageA(IN CONST MSG *lpMsg)
 {
 	WNDPROC proc = _currentWndProc;
@@ -162,6 +164,10 @@ WINUSERAPI BOOL WINAPI TranslateMessage(IN CONST MSG *lpMsg)
 					//UNIMPLEMENTED();
 					break;
 				}
+			}
+
+			if (key >= 32) {
+				DebugPrintf("char: %c", key);
 			}
 
 			// XXX: This does not add extended info to lParam

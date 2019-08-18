@@ -197,6 +197,9 @@
 				RelativePath=".\src\ddraw.cpp">
 			</File>
 			<File
+				RelativePath=".\src\debug.cpp">
+			</File>
+			<File
 				RelativePath=".\src\gdi.cpp">
 			</File>
 			<File
