@@ -110,6 +110,30 @@ GetPrivateProfileStringW(
 #endif // !UNICODE
 
 WINBASEAPI
+BOOL
+WINAPI
+WritePrivateProfileStringA(
+    IN LPCSTR lpAppName,
+    IN LPCSTR lpKeyName,
+    IN LPCSTR lpString,
+    IN LPCSTR lpFileName
+    );
+WINBASEAPI
+BOOL
+WINAPI
+WritePrivateProfileStringW(
+    IN LPCWSTR lpAppName,
+    IN LPCWSTR lpKeyName,
+    IN LPCWSTR lpString,
+    IN LPCWSTR lpFileName
+    );
+#ifdef UNICODE
+#define WritePrivateProfileString  WritePrivateProfileStringW
+#else
+#define WritePrivateProfileString  WritePrivateProfileStringA
+#endif // !UNICODE
+
+WINBASEAPI
 DWORD
 WINAPI
 GetModuleFileNameA(

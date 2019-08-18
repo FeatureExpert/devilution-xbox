@@ -305,7 +305,7 @@ WINBASEAPI DWORD WINAPI GetPrivateProfileStringA(IN LPCSTR lpAppName, IN LPCSTR 
 	int len = strlen(lpKeyName);
 
 	if (!fp) {
-		return(0);
+		return SetLastError(ERROR_FILE_NOT_FOUND), 0;
 	}
 
 	sprintf(t_section, "[%s]", lpAppName);    /* Format the section name */
@@ -313,7 +313,8 @@ WINBASEAPI DWORD WINAPI GetPrivateProfileStringA(IN LPCSTR lpAppName, IN LPCSTR 
 	do {
 		if (!read_line(fp, buff)) {
 			fclose(fp);
-			strncpy(lpReturnedString, lpDefault, nSize);
+			strncpy(lpReturnedString, lpDefault == NULL ? "" : lpDefault, nSize);
+			lpReturnedString[nSize - 1] = '\0';
 			return strlen(lpReturnedString);
 		}
 	} while (strcmp(buff, t_section));
@@ -323,7 +324,8 @@ WINBASEAPI DWORD WINAPI GetPrivateProfileStringA(IN LPCSTR lpAppName, IN LPCSTR 
 	do {
 		if (!read_line(fp, buff) || buff[0] == '\0') {
 			fclose(fp);
-			strncpy(lpReturnedString, lpDefault, nSize);
+			strncpy(lpReturnedString, lpDefault == NULL ? "" : lpDefault, nSize);
+			lpReturnedString[nSize - 1] = '\0';
 			return strlen(lpReturnedString);
 		}
 	} while (strncmp(buff, lpKeyName, len));
@@ -333,7 +335,7 @@ WINBASEAPI DWORD WINAPI GetPrivateProfileStringA(IN LPCSTR lpAppName, IN LPCSTR 
 
 	/* Copy up to buffer_len chars to buffer */
 	strncpy(lpReturnedString, ep, nSize - 1);
-	lpReturnedString[nSize] = '\0';
+	lpReturnedString[nSize - 1] = '\0';
 	fclose(fp);                 /* Clean up and return the amount copied */
 	return strlen(lpReturnedString);
 }
@@ -573,4 +575,95 @@ WINUSERAPI DWORD WINAPI WaitForInputIdle(IN HANDLE hProcess, IN DWORD dwMillisec
 {
 	// TODO: implement
 	return 0;
+}
+
+WINBASEAPI BOOL WINAPI WritePrivateProfileStringA(LPCSTR lpAppName, LPCSTR lpKeyName, LPCSTR lpString, LPCSTR lpFileName)
+{
+	FILE *rfp, *wfp;
+	char tmp_name[15];
+	char buff[MAX_LINE_LENGTH];
+	char t_section[MAX_LINE_LENGTH];
+	int len = strlen(lpKeyName);
+	tmpnam(tmp_name); /* Get a temporary file name to copy to */
+	sprintf(t_section,"[%s]", lpAppName);/* Format the section name */
+
+	if (!(rfp = fopen(lpFileName, "r"))) { /* If the .ini file doesn't exist */
+		if (!(wfp = fopen(lpFileName, "w"))) { /* then make one */
+			return FALSE;
+		}
+
+		fprintf(wfp, "%s\n", t_section);
+		fprintf(wfp, "%s=%s\n", lpKeyName, lpString);
+		fclose(wfp);
+		return TRUE;
+	}
+
+	if (!(wfp = fopen(tmp_name, "w"))) {
+		fclose(rfp);
+
+		return FALSE;
+	}
+
+	/* Move through the file one line at a time until a section is
+	 * matched or until EOF. Copy to temp file as it is read. */
+	do {
+		if (!read_line(rfp, buff)) { /* Failed to find section, so add one to the end */
+			fprintf(wfp, "\n%s\n", t_section);
+			fprintf(wfp, "%s=%s\n", lpKeyName, lpString);
+
+			/* Clean up and rename */
+			fclose(rfp);
+			fclose(wfp);
+			unlink(lpFileName);
+			rename(tmp_name, lpFileName);
+			return TRUE;
+		}
+
+		fprintf(wfp, "%s\n", buff);
+	} while(strcmp(buff, t_section));
+
+	/* Now that the section has been found, find the entry. Stop searching
+	 * upon leaving the section's area. Copy the file as it is read
+	 * and create an entry if one is not found. */
+	while (1) {
+		if (!read_line(rfp, buff)) {
+			/* EOF without an entry so make one */
+			fprintf(wfp, "%s=%s\n", lpKeyName, lpString);
+
+			/* Clean up and rename */
+			fclose(rfp);
+			fclose(wfp);
+			unlink(lpFileName);
+			rename(tmp_name, lpFileName);
+			return(1);
+		}
+
+		if (!strncmp(buff, lpKeyName, len) || buff[0] == '\0') {
+			break;
+		}
+
+		fprintf(wfp, "%s\n", buff);
+	}
+
+	if (buff[0] == '\0') {
+		fprintf(wfp, "%s=%s\n", lpKeyName, lpString);
+
+		do {
+			fprintf(wfp, "%s\n", buff);
+		} while(read_line(rfp, buff));
+	} else {
+		fprintf(wfp, "%s=%s\n", lpKeyName, lpString);
+
+		while (read_line(rfp, buff)) {
+			fprintf(wfp, "%s\n", buff);
+		}
+	}
+
+	/* Clean up and rename */
+	fclose(wfp);
+	fclose(rfp);
+	unlink(lpFileName);
+	rename(tmp_name, lpFileName);
+
+	return TRUE;
 }
