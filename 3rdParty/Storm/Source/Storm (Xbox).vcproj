@@ -193,6 +193,9 @@
 				RelativePath=".\SComp.cpp">
 			</File>
 			<File
+				RelativePath=".\SDraw.cpp">
+			</File>
+			<File
 				RelativePath=".\SFile.cpp">
 			</File>
 			<File

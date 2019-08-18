@@ -85,21 +85,7 @@ BOOL STORMAPI SCodeDelete(HANDLE handle) rBool;
 
 int  STORMAPI SCodeExecute(HANDLE handle, int a2) rInt;
 
-BOOL STORMAPI SDrawAutoInitialize(HINSTANCE hInst, LPCSTR lpClassName, LPCSTR lpWindowName, WNDPROC pfnWndProc, int nMode, int nWidth, int nHeight, int nBits) rBool;
-BOOL STORMAPI SDrawCaptureScreen(const char *source) rBool;
 
-HWND STORMAPI SDrawGetFrameWindow(HWND *sdraw_framewindow) rPVoid;
-BOOL STORMAPI SDrawGetObjects(LPDIRECTDRAW *ddInterface, LPDIRECTDRAWSURFACE *primarySurface, LPDIRECTDRAWSURFACE *surface2, LPDIRECTDRAWSURFACE *surface3, LPDIRECTDRAWSURFACE *backSurface, LPDIRECTDRAWPALETTE *ddPalette, HPALETTE *hPalette) rBool;
-BOOL STORMAPI SDrawGetScreenSize(DWORD *pdwWidth, DWORD *pdwHeight, DWORD *pdwBpp) rBool;
-
-BOOL STORMAPI SDrawLockSurface(int surfacenumber, RECT *lpDestRect, void **lplpSurface, int *lpPitch, int arg_unused) rBool;
-BOOL STORMAPI SDrawManualInitialize(HWND hWnd, LPDIRECTDRAW ddInterface, LPDIRECTDRAWSURFACE primarySurface, LPDIRECTDRAWSURFACE surface2, LPDIRECTDRAWSURFACE surface3, LPDIRECTDRAWSURFACE backSurface, LPDIRECTDRAWPALETTE ddPalette, HPALETTE hPalette) rBool;
-
-BOOL STORMAPI SDrawPostClose() rBool;
-//BOOL STORMAPI SDrawRealizePalette() rBool;
-
-BOOL STORMAPI SDrawUnlockSurface(int surfacenumber, void *lpSurface, int a3, RECT *lpRect) rBool;
-BOOL STORMAPI SDrawUpdatePalette(unsigned int firstentry, unsigned int numentries, PALETTEENTRY *pPalEntries, int a4) rBool;
 
 BOOL STORMAPI SEvtDispatch(DWORD dwMessageID, DWORD dwFlags, int type, PS_EVT pEvent) rBool;
 
@@ -191,10 +177,7 @@ int STORMAPI SBigPowMod(void *buffer1, void *buffer2, int a3, int a4) rInt;
 int STORMAPI SBigToBinaryBuffer(void *buffer, int length, int a3, int a4) rInt;
 //
 
-void __stdcall SDrawMessageBox(const char *,const char *,int) rVoid;
-void __cdecl SDrawDestroy(void) rVoid;
 BOOLEAN __cdecl StormDestroy(void) rBool;
-void __cdecl SDrawRealizePalette(void) rVoid;
 BOOL __cdecl SVidPlayContinue(void) rBool;
 BOOL __stdcall SNetGetOwnerTurnsWaiting(DWORD *) rBool;
 BOOL __stdcall SNetUnregisterEventHandler(int,SEVTHANDLER) rPVoid;
@@ -202,7 +185,6 @@ BOOL __stdcall SNetRegisterEventHandler(int,SEVTHANDLER) rPVoid;
 BOOLEAN __stdcall SNetSetBasePlayer(int) rBool;
 int __stdcall SNetInitializeProvider(unsigned long,struct _SNETPROGRAMDATA *,struct _SNETPLAYERDATA *,struct _SNETUIDATA *,struct _SNETVERSIONDATA *) rInt;
 int __stdcall SNetGetProviderCaps(struct _SNETCAPS *) rInt;
-void __stdcall SDrawClearSurface(int a1) rVoid;
 BOOL __stdcall SDlgSetBitmapI(HWND hWnd, int a2, char *src, int mask1, int flags, void *pBuff, int a7, int width, int height, int mask2) rBool;
 void __stdcall SDlgBeginPaint(HWND hWnd, char *a2) rVoid;
 void __stdcall SDlgEndPaint(HWND hWnd, char *a2) rVoid;
