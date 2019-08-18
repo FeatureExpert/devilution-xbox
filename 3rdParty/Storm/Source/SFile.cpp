@@ -28,7 +28,7 @@ static DWORD StormBuffer[STORM_BUFFER_SIZE];    // Buffer for the decryption eng
 static BOOL directFileAccess;
 static LCID lcFileLocale;
 
-LPDIRECTSOUND sound;
+static LPDIRECTSOUND dsound;
 LPDIRECTSOUNDBUFFER  soundBuffer;
 char * BasePath = "";
 HANDLE archive;
@@ -4578,7 +4578,6 @@ BOOL STORMAPI SFileCloseFile(HANDLE hFile)
 	return TRUE;
 }
 
-#if 0
 BOOL STORMAPI SFileDdaBegin(HANDLE hFile, DWORD flags, DWORD mask)
 {
 	return SFileDdaBeginEx(hFile, flags, mask, 0, INT_MAX, INT_MAX, 0);
@@ -4618,7 +4617,7 @@ BOOL STORMAPI SFileDdaBeginEx(HANDLE hFile, DWORD flags, DWORD mask, unsigned __
 				if (chunkLength < 16) {
 					// Wave format chunk too small
 				} else {
-					byte *buffer = (BYTE *)malloc(chunkLength);
+					BYTE * buffer = (BYTE *)malloc(chunkLength);
 					WORD nChannels;
 					DWORD nSamplesPerSec;
 					WORD wBitsPerSample;
@@ -4657,9 +4656,14 @@ BOOL STORMAPI SFileDdaBeginEx(HANDLE hFile, DWORD flags, DWORD mask, unsigned __
 		dsbd.dwSize = sizeof(DSBUFFERDESC);
 		dsbd.dwBufferBytes = 0;
 
-		sound->CreateSoundBuffer(&dsbd, &soundBuffer, NULL);
+		dsound->CreateSoundBuffer(&dsbd, &soundBuffer, NULL);
 
 		soundBuffer->SetBufferData(audioBuffer, audioBufferSize);
+
+		// TODO: volume and panning
+		//soundBuffer->SetVolume();
+		//soundBuffer->SetPan();
+		soundBuffer->Play(0, 0, 0);
 
 		return TRUE;
 	}
@@ -4714,9 +4718,16 @@ BOOL STORMAPI SFileDdaGetPos(HANDLE hFile, DWORD *current, DWORD *end)
 	return TRUE;
 }
 
+// @implemented
 BOOL STORMAPI SFileDdaInitialize(HANDLE directsound)
 {
-	// TODO: implement
+	if (directsound == NULL) {
+		SErrSetLastError(ERROR_INVALID_PARAMETER);
+
+		return FALSE;
+	}
+
+	dsound = (LPDIRECTSOUND)directsound;
 
 	return TRUE;
 }
@@ -4727,7 +4738,6 @@ BOOL STORMAPI SFileDdaSetVolume(HANDLE hFile, signed int bigvolume, signed int v
 
 	return TRUE;
 }
-#endif
 
 BOOL STORMAPI SFileDestroy()
 {

@@ -61,14 +61,6 @@ BOOL STORMAPI SDlgSetBitmapE(HWND hWnd, int a2, char *src, int mask1, int flags,
 
 int STORMAPI Ordinal224(int a1) rInt;
 
-BOOL STORMAPI SFileDdaBeginEx(HANDLE hFile, DWORD flags, DWORD mask, unsigned __int32 lDistanceToMove, signed __int32 volume, signed int a6, int a7) rBool;
-BOOL STORMAPI SFileDdaDestroy() rBool;
-BOOL STORMAPI SFileDdaEnd(HANDLE hFile) rBool;
-BOOL STORMAPI SFileDdaGetPos(HANDLE hFile, DWORD *current, DWORD *end) rBool;
-
-BOOL STORMAPI SFileDdaInitialize(HANDLE directsound) rBool;
-BOOL STORMAPI SFileDdaSetVolume(HANDLE hFile, signed int bigvolume, signed int volume) rBool;
-
 BOOL STORMAPI SBltROP3(void *lpDstBuffer, void *lpSrcBuffer, int width, int height, int a5, int a6, int a7, DWORD rop) rBool;
 BOOL STORMAPI SBltROP3Clipped(void *lpDstBuffer, RECT *lpDstRect, POINT *lpDstPt, int a4, void *lpSrcBuffer, RECT *lpSrcRect, POINT *lpSrcPt, int a8, int a9, DWORD rop) rBool;
 BOOL STORMAPI SBltROP3Tiled(void *lpDstBuffer, RECT *lpDstRect, POINT *lpDstPt, int a4, void *lpSrcBuffer, RECT *lpSrcRect, POINT *lpSrcPt, int a8, int a9, DWORD rop) rBool;
@@ -116,14 +108,6 @@ BOOL STORMAPI STransCombineMasks(HANDLE hTransA, HANDLE hTransB, int left, int t
 BOOL STORMAPI STransCreateE(void *pBuffer, int width, int height, int bpp, int a5, int bufferSize, HANDLE *phTransOut) rBool;
 BOOL STORMAPI STransCreateI(void *pBuffer, int width, int height, int bpp, int a5, int bufferSize, HANDLE *phTransOut) rBool;
 
-BOOL STORMAPI SVidDestroy() rBool;
-BOOL STORMAPI SVidGetSize(HANDLE video, int width, int height, int zero) rBool;
-BOOL STORMAPI SVidInitialize(HANDLE video) rBool;
-BOOL STORMAPI SVidPlayBegin(const char *filename, int a2, int a3, int a4, int a5, int flags, HANDLE *video) rBool;
-
-BOOL STORMAPI SVidPlayContinueSingle(HANDLE video, int a2, int a3) rBool;
-BOOL STORMAPI SVidPlayEnd(HANDLE video) rBool;
-
 BOOL STORMAPI SErrDisplayError(DWORD dwErrMsg, const char *logfilename, int logline, const char *message, BOOL allowOption, int exitCode) rBool;
 BOOL STORMAPI SErrGetErrorStr(DWORD dwErrCode, char *buffer, size_t bufferchars) rBool;
 DWORD STORMAPI SErrGetLastError() rInt;
@@ -169,7 +153,6 @@ int STORMAPI SBigToBinaryBuffer(void *buffer, int length, int a3, int a4) rInt;
 //
 
 BOOLEAN __cdecl StormDestroy(void) rBool;
-BOOL __cdecl SVidPlayContinue(void) rBool;
 BOOL __stdcall SNetGetOwnerTurnsWaiting(DWORD *) rBool;
 BOOL __stdcall SNetUnregisterEventHandler(int,SEVTHANDLER) rPVoid;
 BOOL __stdcall SNetRegisterEventHandler(int,SEVTHANDLER) rPVoid;

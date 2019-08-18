@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Storm"
-	ProjectGUID="{16738915-8E54-4CC2-8271-6980E191141E}"
+	Name="libsmacker"
+	ProjectGUID="{7083190D-4CC9-4B58-974A-BC7D36D8BAD9}"
 	Keyword="XboxProj">
 	<Platforms>
 		<Platform
@@ -20,7 +20,6 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\..\..\miniwin\include;..\..\libsmacker"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -190,25 +189,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\SComp.cpp">
+				RelativePath=".\smacker.c">
 			</File>
 			<File
-				RelativePath=".\SDraw.cpp">
-			</File>
-			<File
-				RelativePath=".\SFile.cpp">
-			</File>
-			<File
-				RelativePath=".\SMem.cpp">
-			</File>
-			<File
-				RelativePath=".\SReg.cpp">
-			</File>
-			<File
-				RelativePath=".\storm.cpp">
-			</File>
-			<File
-				RelativePath=".\SVid.cpp">
+				RelativePath=".\smk_bitstream.c">
 			</File>
 		</Filter>
 		<Filter
@@ -216,22 +200,19 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\FileStream.h">
+				RelativePath=".\smacker.h">
 			</File>
 			<File
-				RelativePath=".\mpk.h">
+				RelativePath=".\smk_bitstream.h">
 			</File>
 			<File
-				RelativePath=".\sqp.h">
+				RelativePath=".\smk_hufftree.c">
 			</File>
 			<File
-				RelativePath=".\storm.h">
+				RelativePath=".\smk_hufftree.h">
 			</File>
 			<File
-				RelativePath=".\StormCommon.h">
-			</File>
-			<File
-				RelativePath=".\StormLib.h">
+				RelativePath=".\smk_malloc.h">
 			</File>
 		</Filter>
 	</Files>
