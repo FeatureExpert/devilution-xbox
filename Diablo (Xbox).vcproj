@@ -52,6 +52,7 @@
 				Name="VCPreBuildEventTool"
 				CommandLine="bundler xbelogo\titleimage.rdf -o xbelogo\titleimage.xbx
 bundler xbelogo\saveimage.rdf -o xbelogo\saveimage.xbx
+$(ConfigurationName)\res2bin /OUT:$(IntDir)\diabloui.bin DiabloUI\diabloui.res
 "/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
@@ -64,6 +65,7 @@ bundler xbelogo\saveimage.rdf -o xbelogo\saveimage.xbx
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				LimitAvailableMemoryTo64MB="TRUE"
+				InsertFile="$(IntDir)\diabloui.bin,.rsrc,R"
 				NoLibWarn="TRUE"
 				TitleID="0x4C545244"
 				XboxGameRegion="7"

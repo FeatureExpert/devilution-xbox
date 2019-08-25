@@ -1,0 +1,155 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "msg.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winresrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "msg.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winresrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "Resource File To Binary Blob Conversion Utility"
+            VALUE "FileVersion", "1, 0, 0, 0"
+            VALUE "InternalName", "res2bin"
+            VALUE "LegalCopyright", "© Microsoft Corporation. All rights reserved."
+            VALUE "OriginalFilename", "res2bin"
+            VALUE "ProductName", "Windows (R) Win 7 DDK driver"
+            VALUE "ProductVersion", "1, 0, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    ERR_CANTREADFILE        "cannot open %s for reading"
+    ERR_OUTOFMEMORY         "out of memory; %u bytes required"
+    ERR_FILEREADERR         "cannot read file"
+END
+
+STRINGTABLE
+BEGIN
+    ERR_FILETELLERR         "cannot get location in file"
+    ERR_FILESEEKERR         "cannot seek in file"
+    ERR_FILEWRITEERR        "cannot write to file"
+    ERR_FILECORRUPT         "%s is corrupt"
+    ERR_CANTWRITEFILE       "cannot open %s for writing"
+END
+
+STRINGTABLE
+BEGIN
+    ERR_DUPRES1             "duplicate resource -- type:%S,%c"
+    ERR_DUPRES2             "duplicate resource -- type:%s,%c"
+    ERR_DUPRESID            "duplicate resource -- type:%ld,%c"
+    ERR_NAMESTR             "name:%S, language:0x%.4x\n"
+    ERR_NAMEID              "name:%ld, language:0x%.4x\n"
+END
+
+STRINGTABLE
+BEGIN
+    WARN_NOMACHINESPECIFIED "machine type not specified; assumed %s"
+END
+
+STRINGTABLE
+BEGIN
+    INFO_ADDRESOURCE1       "adding resource -- type:%S,%c"
+    INFO_ADDRESOURCE2       "adding resource -- type:%s,%c"
+    INFO_ADDRESOURCE3       "adding resource -- type:%ld,%c"
+    INFO_NAME1              "name:%S,%c"
+    INFO_NAME2              "name:%ld,%c"
+    INFO_LANGUAGE           "language:%x, flags:%x, size:%ld\n"
+END
+
+STRINGTABLE
+BEGIN
+    MSG_ERROR               "RES2BIN : fatal error R2B%04d:%c"
+    MSG_WARNING             "RES2BIN : warning R2B%04d:%c"
+    MSG_VERSION             "Microsoft (R) Windows Resource To Object Converter Version %s\n"
+    MSG_COPYRIGHT           "Copyright (C) Microsoft Corp 1992-1995. All rights reserved.\n"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

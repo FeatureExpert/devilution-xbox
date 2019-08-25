@@ -2,6 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "diablo", "diablo (Xbox).vcproj", "{17E182A3-23AD-4615-9969-0DB9EA8F0147}"
 	ProjectSection(ProjectDependencies) = postProject
 		{16738915-8E54-4CC2-8271-6980E191141E} = {16738915-8E54-4CC2-8271-6980E191141E}
+		{353D0B54-965B-46DE-9B39-76179A2EED69} = {353D0B54-965B-46DE-9B39-76179A2EED69}
 		{B2334361-17E5-4858-8193-F54D21C79F25} = {B2334361-17E5-4858-8193-F54D21C79F25}
 		{FF7A0E71-DEB0-47DF-8DF6-6E8393F45824} = {FF7A0E71-DEB0-47DF-8DF6-6E8393F45824}
 		{8B6477D0-9F28-484B-B029-1CE5183B1CAF} = {8B6477D0-9F28-484B-B029-1CE5183B1CAF}
@@ -28,6 +29,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniwin", "miniwin\miniwin.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsmacker", "3rdParty\libsmacker\libsmacker (Xbox).vcproj", "{7083190D-4CC9-4B58-974A-BC7D36D8BAD9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "res2bin", "3rdParty\res2bin\res2bin.vcproj", "{353D0B54-965B-46DE-9B39-76179A2EED69}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -100,6 +105,16 @@ Global
 		{7083190D-4CC9-4B58-974A-BC7D36D8BAD9}.Release.Build.0 = Release|Xbox
 		{7083190D-4CC9-4B58-974A-BC7D36D8BAD9}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{7083190D-4CC9-4B58-974A-BC7D36D8BAD9}.Release_LTCG.Build.0 = Release_LTCG|Xbox
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Debug.ActiveCfg = Debug|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Debug.Build.0 = Debug|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Profile.ActiveCfg = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Profile.Build.0 = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Profile_FastCap.ActiveCfg = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Profile_FastCap.Build.0 = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Release.ActiveCfg = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Release.Build.0 = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Release_LTCG.ActiveCfg = Release|Win32
+		{353D0B54-965B-46DE-9B39-76179A2EED69}.Release_LTCG.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -4,14 +4,22 @@
 #include <stdio.h>
 #include <ShlObj.h>
 #include <ShellAPI.h>
+#include <TChar.h>
 
 #include <assert.h>
 
 extern LD_LAUNCH_DASHBOARD launchDashboard;
 extern void DebugPrintf(const char * fmt, ...);
 
+#define IS_RES_ID(lpName) (!((DWORD)(lpName)&0xFFFF0000))
+
 #define MAX_LINE_LENGTH    80
 static BOOL read_line(FILE * fp, char *bp);
+
+static HANDLE resourceSectionHandle;
+static DWORD resourceRva;
+
+static int CmpLPCTSTRStringU(LPCTSTR lpStr, IMAGE_RESOURCE_DIR_STRING_U *lpStrU);
 
 static inline void __cpuid(int CPUInfo[], const int InfoType)
 {
@@ -25,7 +33,157 @@ static inline void __cpuid(int CPUInfo[], const int InfoType)
 	}
 }
 
-uintptr_t _beginthreadex(void * security, unsigned stack_size, unsigned (__stdcall *start_address)(void *), void * arglist, unsigned initflag, unsigned * thrdaddr)
+static bool CheckResourceSection()
+{
+	if (resourceSectionHandle == NULL) {
+		resourceSectionHandle = XGetSectionHandle(".rsrc");
+
+		if (resourceSectionHandle == NULL) {
+			return false;
+		}
+
+		resourceRva = (DWORD)XLoadSectionByHandle(resourceSectionHandle);
+	}
+
+	return true;
+}
+
+static int CmpLPCTSTRName(DWORD dwResDirVA, LPCTSTR lpStr, DWORD Name)
+{
+	if (IS_RES_ID(lpStr)) {
+		if ((WORD)lpStr < (WORD)Name) {
+			return -1;
+		} else if ((WORD)lpStr > (WORD)Name) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else {
+		return CmpLPCTSTRStringU(lpStr, (IMAGE_RESOURCE_DIR_STRING_U *)(dwResDirVA + (Name & 0x7FFFFFFF)));
+	}
+}
+
+static int CmpLPCTSTRStringU(LPCTSTR lpStr, IMAGE_RESOURCE_DIR_STRING_U *lpStrU)
+{
+	int result;
+	DWORD StrLen = (DWORD)lstrlen(lpStr);
+	LPTSTR UniStr;
+
+	/*
+	 * In ANSI version we convert the unicode resource string to ANSI.
+	 */
+
+#ifdef UNICODE
+	UniStr = (LPWSTR)&lpStrU->NameString;
+#else  /* UNICODE */
+	UniStr = (LPSTR)malloc(lpStrU->Length);
+
+	if (!UniStr) {
+		return SetLastError(ERROR_OUTOFMEMORY), 0;
+	}
+
+	if (WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)&lpStrU->NameString,
+		    lpStrU->Length, UniStr, lpStrU->Length, NULL, NULL)
+		!= lpStrU->Length) {
+		return free(UniStr), SetLastError(ERROR_INVALID_DATA), 0;
+	}
+#endif /* UNICODE */
+
+#if !_XBOX
+	result = CompareString(
+	             LOCALE_USER_DEFAULT,
+	             0,
+	             lpStr,
+	             StrLen,
+	             UniStr,
+	             lpStrU->Length)
+	    - CSTR_EQUAL; /* subtract 2 to be consistent with normal strcmp() */
+#else
+	result = strcmp(lpStr, UniStr);
+#endif
+
+#ifndef UNICODE
+	free(UniStr);
+#endif /* !UNICODE */
+
+return result;
+}
+
+static bool ConvertResName(LPCTSTR *lplpStr)
+{
+	if (!IS_RES_ID(*lplpStr)) {
+		if ((*lplpStr)[0] == '#') {
+			errno = 0;
+			LPTSTR endptr;
+			long num = _tcstol(*lplpStr + 1, &endptr, 10); // strtol() or wcstol()
+
+			if (errno != 0 ||               // conversion error
+			    (*lplpStr + 1) == endptr || // there were no decimal digits
+			    (DWORD)num > 0xFFFF) {      // too big ID
+				return false;
+			}
+
+			*lplpStr = (LPCTSTR)num;
+		}
+	}
+
+	return true;
+}
+
+static IMAGE_RESOURCE_DIRECTORY_ENTRY *FindResDirEntry(DWORD dwResDirVA, IMAGE_RESOURCE_DIRECTORY *lpDir, LPCSTR lpName)
+{
+	DWORD low, high, mid;
+
+	IMAGE_RESOURCE_DIRECTORY_ENTRY *entries = (IMAGE_RESOURCE_DIRECTORY_ENTRY *)(lpDir + 1);
+
+	/*
+	 * Since the IMAGE_RESOURCE_DIRECTORY_ENTRY structures of a node
+	 * are always in ascending order by their Name fields we can use
+	 * binary halving to reduce search time to log2 (n) + 1 steps at
+	 * worst case.
+	 */
+
+	if (!ConvertResName(&lpName)) {
+		// TODO: verify error code is correct
+		return SetLastError(ERROR_RESOURCE_NAME_NOT_FOUND), NULL;
+	}
+
+	if (IS_RES_ID(lpName)) {
+		low  = lpDir->NumberOfNamedEntries;
+		high = low + lpDir->NumberOfIdEntries;
+	} else {
+		low  = 0;
+		high = lpDir->NumberOfNamedEntries;
+	}
+
+	/*
+	 * low: index of the first directory entry we must search in.
+	 * high: index of the last directory entry we want to search in + 1.
+	 */
+
+	while (high > low) {
+		mid        = (high + low) >> 1;
+		int cmpres = CmpLPCTSTRName(dwResDirVA, lpName, entries[mid].Name);
+
+		if (!cmpres) {
+			if (GetLastError() == ERROR_INVALID_DATA) {
+				return NULL;
+			}
+
+			return &entries[mid];
+		}
+
+		if (cmpres < 0) {
+			high = mid;
+		} else {
+			low = mid + 1;
+		}
+	}
+
+	return NULL;
+}
+
+uintptr_t _beginthreadex(void *security, unsigned stack_size, unsigned(__stdcall *start_address)(void *), void *arglist, unsigned initflag, unsigned *thrdaddr)
 {
 	return (uintptr_t)CreateThread((LPSECURITY_ATTRIBUTES)security, stack_size, (LPTHREAD_START_ROUTINE)start_address, arglist, initflag, (LPDWORD)thrdaddr);
 }
@@ -63,8 +221,35 @@ WINBASEAPI DECLSPEC_NORETURN VOID WINAPI ExitProcess(IN UINT uExitCode)
 
 WINBASEAPI HRSRC WINAPI FindResourceA(IN HMODULE hModule, IN LPCSTR lpName, IN LPCSTR lpType)
 {
-	// TODO: implement
-	return NULL;
+	IMAGE_RESOURCE_DATA_ENTRY *result = NULL;
+	IMAGE_RESOURCE_DIRECTORY_ENTRY *entry;
+	IMAGE_RESOURCE_DIRECTORY *lang_dir;
+
+	if (!CheckResourceSection()) {
+		return SetLastError(ERROR_RESOURCE_DATA_NOT_FOUND), NULL;
+	}
+
+	entry = FindResDirEntry(resourceRva, (IMAGE_RESOURCE_DIRECTORY *)resourceRva, lpType);
+
+	if (entry == NULL) {
+		return SetLastError(ERROR_RESOURCE_TYPE_NOT_FOUND), NULL;
+	}
+
+	entry = FindResDirEntry(resourceRva, (IMAGE_RESOURCE_DIRECTORY *)(resourceRva + (entry->OffsetToData & 0x7FFFFFFF)), lpName);
+
+	if (entry == NULL) {
+		return SetLastError(ERROR_RESOURCE_NAME_NOT_FOUND), NULL;
+	}
+
+	lang_dir = (IMAGE_RESOURCE_DIRECTORY *)(resourceRva + (entry->OffsetToData & 0x7FFFFFFF));
+
+	if (!lang_dir->NumberOfIdEntries) {
+		return SetLastError(ERROR_RESOURCE_LANG_NOT_FOUND), NULL;
+	}
+
+	entry = (IMAGE_RESOURCE_DIRECTORY_ENTRY *)(lang_dir + 1);
+
+	return SetLastError(NO_ERROR), (HRSRC)(resourceRva + (entry->OffsetToData & 0x7FFFFFFF));
 }
 
 WINBASEAPI HRSRC WINAPI FindResourceW(IN HMODULE hModule, IN LPCWSTR lpName, IN LPCWSTR lpType)
@@ -479,14 +664,20 @@ WINUSERAPI DWORD WINAPI GetWindowThreadProcessId(IN HWND hWnd, OUT LPDWORD lpdwP
 
 WINBASEAPI HGLOBAL WINAPI LoadResource(IN HMODULE hModule, IN HRSRC hResInfo)
 {
-	// TODO: implement
-	return NULL;
+	IMAGE_RESOURCE_DATA_ENTRY *lpDataEntry = (IMAGE_RESOURCE_DATA_ENTRY *)hResInfo;
+
+	assert(hModule == NULL);
+
+	if (hResInfo == NULL) {
+		return SetLastError(ERROR_INVALID_PARAMETER), NULL;
+	}
+
+	return (HGLOBAL)(resourceRva + (lpDataEntry->OffsetToData & 0x7FFFFFFF));
 }
 
 WINBASEAPI LPVOID WINAPI LockResource(IN HGLOBAL hResData)
 {
-	// TODO: implement
-	return NULL;
+	return (LPVOID)hResData;
 }
 
 WINBASEAPI LPVOID WINAPI MapViewOfFile(IN HANDLE hFileMappingObject, IN DWORD dwDesiredAccess, IN DWORD dwFileOffsetHigh, IN DWORD dwFileOffsetLow, IN SIZE_T dwNumberOfBytesToMap)
@@ -549,8 +740,15 @@ HRESULT STDAPICALLTYPE SHGetSpecialFolderLocation(HWND hwnd, int csidl, LPITEMID
 
 WINBASEAPI DWORD WINAPI SizeofResource(IN HMODULE hModule, IN HRSRC hResInfo)
 {
-	// TODO: implement
-	return 0;
+	IMAGE_RESOURCE_DATA_ENTRY *lpDataEntry = (IMAGE_RESOURCE_DATA_ENTRY *)hResInfo;
+
+	assert(hModule == NULL);
+
+	if (hResInfo == NULL) {
+		return SetLastError(ERROR_INVALID_PARAMETER), NULL;
+	}
+
+	return lpDataEntry->Size;
 }
 
 WINBASEAPI BOOL WINAPI UnmapViewOfFile(IN LPCVOID lpBaseAddress)
