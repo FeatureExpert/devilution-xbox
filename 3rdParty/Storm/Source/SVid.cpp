@@ -3,288 +3,45 @@
 
 #include <Windows.h>
 
+#include <XGraphics.h>
+
 extern IDirect3DDevice8 * d3dDevice;
+extern void DebugPrintf(const char * fmt, ...);
 
 double SVidFrameEnd;
 double SVidFrameLength;
 smk SVidSMK;
-PALETTEENTRY SVidPalette[256];
-IDirect3DSurface8 *SVidSurface;
+IDirect3DTexture8 *SVidTexture;
+IDirect3DPalette8 *SVidPalette;
 BYTE *SVidBuffer;
 BOOL SVidLoop;
+BYTE *SVidTextureBuffer;
 IDirectSoundBuffer8 *deviceId;
 unsigned long SVidWidth, SVidHeight;
+unsigned long SVidTexWidth, SVidTexHeight;
+
+// FIXME: resolution is assumed to be 640x480. Tie this to the actual resolution, instead.
+
+static inline DWORD roundup(DWORD v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v++;
+
+	return v;
+}
+
+struct CUSTOMVERTEX
+{
+	float x, y, z, w;
+	float tu, tv;
+};
 
 static LPDIRECTSOUND dsound;
-
-#if defined(_M_IX86) || defined(__i386__) || defined(__386__)
-#define PREFIX16    0x66
-#define STORE_BYTE  0xAA
-#define STORE_WORD  0xAB
-#define LOAD_BYTE   0xAC
-#define LOAD_WORD   0xAD
-#define RETURN      0xC3
-#else
-#error Need assembly opcodes for this architecture
-#endif
-
-static __declspec(align(16)) BYTE copy_row[4096];
-
-static int generate_rowbytes(int src_w, int dst_w, int bpp)
-{
-	static struct
-	{
-		int bpp;
-		int src_w;
-		int dst_w;
-		int status;
-	} last;
-
-	int i;
-	int pos, inc;
-	unsigned char *eip, *fence;
-	unsigned char load, store;
-
-	/* See if we need to regenerate the copy buffer */
-	if ((src_w == last.src_w) && (dst_w == last.dst_w) && (bpp == last.bpp)) {
-		return (last.status);
-	}
-	last.bpp = bpp;
-	last.src_w = src_w;
-	last.dst_w = dst_w;
-	last.status = -1;
-
-	switch (bpp) {
-	case 1:
-		load = LOAD_BYTE;
-		store = STORE_BYTE;
-		break;
-	case 2:
-	case 4:
-		load = LOAD_WORD;
-		store = STORE_WORD;
-		break;
-	default:
-		//return SDL_SetError("ASM stretch of %d bytes isn't supported", bpp);
-		return -2;
-	}
-
-	pos = 0x10000;
-	inc = (src_w << 16) / dst_w;
-	eip = copy_row;
-	fence = copy_row + sizeof(copy_row) - 2;
-
-	for (i = 0; i < dst_w; ++i) {
-		while (pos >= 0x10000L) {
-			if (eip == fence) {
-				return -1;
-			}
-
-			if (bpp == 2) {
-				*eip++ = PREFIX16;
-			}
-
-			*eip++ = load;
-			pos -= 0x10000L;
-		}
-
-		if (eip == fence) {
-			return -1;
-		}
-
-		if (bpp == 2) {
-			*eip++ = PREFIX16;
-		}
-
-		*eip++ = store;
-		pos += inc;
-	}
-
-	*eip++ = RETURN;
-
-	last.status = 0;
-	return 0;
-}
-
-#define DEFINE_COPY_ROW(name, type)         \
-static void name(type *src, int src_w, type *dst, int dst_w)    \
-{                                           \
-	int i;                                  \
-	int pos, inc;                           \
-	type pixel = 0;                         \
-											\
-	pos = 0x10000;                          \
-	inc = (src_w << 16) / dst_w;            \
-	for ( i=dst_w; i>0; --i ) {             \
-		while ( pos >= 0x10000L ) {         \
-			pixel = *src++;                 \
-			pos -= 0x10000L;                \
-		}                                   \
-		*dst++ = pixel;                     \
-		pos += inc;                         \
-	}                                       \
-}
-/* *INDENT-OFF* */
-DEFINE_COPY_ROW(copy_row1, BYTE)
-DEFINE_COPY_ROW(copy_row2, USHORT)
-DEFINE_COPY_ROW(copy_row4, DWORD)
-/* *INDENT-ON* */
-
-/* The ASM code doesn't handle 24-bpp stretch blits */
-static void copy_row3(BYTE * src, int src_w, BYTE * dst, int dst_w)
-{
-	int i;
-	int pos, inc;
-	BYTE pixel[3] = { 0, 0, 0 };
-
-	pos = 0x10000;
-	inc = (src_w << 16) / dst_w;
-
-	for (i = dst_w; i > 0; --i) {
-		while (pos >= 0x10000L) {
-			pixel[0] = *src++;
-			pixel[1] = *src++;
-			pixel[2] = *src++;
-			pos -= 0x10000L;
-		}
-
-		*dst++ = pixel[0];
-		*dst++ = pixel[1];
-		*dst++ = pixel[2];
-		pos += inc;
-	}
-}
-
-#define BlitScaled UpperBlitScaled
-
-static HRESULT LowerBlitScaled(IDirect3DSurface8 * const src, const RECT * srcRect, IDirect3DSurface8 * const dst, const RECT * dstRect)
-{
-	HRESULT result;
-	int pos, inc;
-	int dst_maxrow;
-	int src_row, dst_row;
-	BYTE *srcp = NULL;
-	BYTE *dstp;
-	RECT full_src;
-	RECT full_dst;
-	D3DSURFACE_DESC srcDesc;
-	D3DLOCKED_RECT  srcLock;
-	D3DSURFACE_DESC dstDesc;
-	D3DLOCKED_RECT  dstLock;
-	BOOL use_asm = TRUE;
-
-	if (src == NULL || dst == NULL) {
-		return E_INVALIDARG;
-	}
-
-	if (FAILED(result = src->GetDesc(&srcDesc))) {
-		return result;
-	}
-
-	if (FAILED(result = dst->GetDesc(&dstDesc))) {
-		return result;
-	}
-
-	/* Verify the blit rectangles */
-	if (srcRect) {
-		if ((srcRect->left < 0) || (srcRect->top < 0) ||
-			(srcRect->right > srcDesc.Width) ||
-			(srcRect->bottom > srcDesc.Height)) {
-			return E_INVALIDARG;
-		}
-	} else {
-		full_src.left = 0;
-		full_src.top = 0;
-		full_src.right = srcDesc.Width;
-		full_src.bottom = srcDesc.Height;
-		srcRect = &full_src;
-	}
-
-	if (dstRect) {
-		if ((dstRect->left < 0) || (dstRect->top < 0) ||
-			(dstRect->right > dstDesc.Width) ||
-			(dstRect->bottom > dstDesc.Height)) {
-			return E_INVALIDARG;
-		}
-	} else {
-		full_dst.left = 0;
-		full_dst.top = 0;
-		full_dst.right = dstDesc.Width;
-		full_dst.bottom = dstDesc.Height;
-		dstRect = &full_dst;
-	}
-
-	if (FAILED(result = dst->LockRect(&dstLock, NULL, D3DLOCK_TILED))) {
-		return result;
-	}
-
-	if (FAILED(result = src->LockRect(&srcLock, srcRect, D3DLOCK_READONLY))) {
-		dst->UnlockRect();
-
-		return result;
-	}
-
-	/* Set up the data... */
-	pos = 0x10000;
-	inc = ((srcRect->bottom - srcRect->top) << 16) / (dstRect->bottom - dstRect->top);
-	src_row = srcRect->top;
-	dst_row = dstRect->top;
-
-	if (generate_rowbytes(srcRect->right - srcRect->left, dstRect->right - dstRect->left, 4) < 0) {
-		use_asm = FALSE;
-	}
-
-	/* Perform the stretch blit */
-	for (dst_maxrow = dst_row + (dstRect->bottom - dstRect->top); dst_row < dst_maxrow; ++dst_row) {
-		dstp = (BYTE *)dstLock.pBits + (dst_row * dstLock.Pitch) + (dstRect->left * 4);
-
-		while (pos >= 0x10000L) {
-			srcp = (BYTE *)srcLock.pBits + (src_row * srcLock.Pitch) + (srcRect->left * 4);
-			++src_row;
-			pos -= 0x10000L;
-		}
-
-		if (use_asm) {
-			/* *INDENT-OFF* */
-			{
-				void *code = copy_row;
-				__asm {
-					push	edi
-					push	esi
-					mov 	edi, dstp
-					mov 	esi, srcp
-					call	dword ptr code
-					pop 	esi
-					pop 	edi
-				}
-			}
-			/* *INDENT-ON* */
-		} else
-			switch (4) {
-			case 1:
-				copy_row1(srcp, srcRect->right - srcRect->left, dstp, dstRect->right - dstRect->left);
-				break;
-			case 2:
-				copy_row2((USHORT *)srcp, srcRect->right - srcRect->left,
-						  (USHORT *)dstp, dstRect->right - dstRect->left);
-				break;
-			case 3:
-				copy_row3(srcp, srcRect->right - srcRect->left, dstp, dstRect->right - dstRect->left);
-				break;
-			case 4:
-				copy_row4((DWORD *)srcp, srcRect->right - srcRect->left,
-						  (DWORD *)dstp, dstRect->right - dstRect->left);
-				break;
-			}
-
-		pos += inc;
-	}
-
-	dst->UnlockRect();
-	src->UnlockRect();
-
-	return D3D_OK;
-}
 
 static BOOL SVidLoadNextFrame()
 {
@@ -303,6 +60,16 @@ static BOOL SVidLoadNextFrame()
 
 BOOL STORMAPI SVidPlayBegin(const char *filename, int a2, int a3, int a4, int a5, int flags, HANDLE *video)
 {
+	DebugPrintf(
+		"SVidPlayBegin(\"%s\", %i, %i, %i, %i, %i, 0x%p)\n",
+		filename,
+		a2,
+		a3,
+		a4,
+		a5,
+		flags,
+		video);
+
 	if (flags & 0x10000 || flags & 0x20000000) {
 		return FALSE;
 	}
@@ -347,12 +114,19 @@ BOOL STORMAPI SVidPlayBegin(const char *filename, int a2, int a3, int a4, int a5
 		dsbd.lpwfxFormat = &wfx;
 
 		if (FAILED(result = IDirectSound_CreateSoundBuffer(dsound, &dsbd, &deviceId, NULL))) {
+			DebugPrintf("IDirectSound_CreateSoundBuffer: 0x08X\n", result);
 			// TODO: log error
 
 			return FALSE;
 		}
 
-		deviceId->Play(0, 0, 0); /* start audio playing. */
+		if (FAILED(result = deviceId->Play(0, 0, 0))) { /* start audio playing. */
+			DebugPrintf("deviceId->Play: 0x08X\n", result);
+		}
+
+		if (FAILED(result = deviceId->SetVolume(DSBVOLUME_MAX))) {
+			DebugPrintf("deviceId->SetVolume: 0x08X\n", result);
+		}
 	}
 
 	unsigned long nFrames;
@@ -364,30 +138,36 @@ BOOL STORMAPI SVidPlayBegin(const char *filename, int a2, int a3, int a4, int a5
 
 	smk_info_video(SVidSMK, &SVidWidth, &SVidHeight, NULL);
 
-	if (FAILED(result = d3dDevice->CreateImageSurface(SVidWidth, SVidHeight, D3DFMT_LIN_X8R8G8B8, &SVidSurface))) {
+	SVidTexWidth = roundup(SVidWidth);
+	SVidTexHeight = roundup(SVidHeight);
+
+	if (FAILED(result = d3dDevice->CreateTexture(SVidTexWidth, SVidTexHeight, 1, 0, D3DFMT_P8, 0, &SVidTexture))) {
+		DebugPrintf("d3dDevice->CreateTexture: 0x08X\n", result);
 		// TODO: log error
 
 		return FALSE;
 	}
 
+	SVidTextureBuffer = (BYTE *)SMemAlloc(SVidTexWidth * SVidTexHeight, "P:\\Projects\\Storm\\Storm-SWAR\\Source\\SVid.cpp", __LINE__, 0);
+
 	const unsigned char *palette_data = smk_get_palette(SVidSMK);
 	const unsigned char *video_data = smk_get_video(SVidSMK);
 
-	D3DLOCKED_RECT rect;
-	SVidSurface->LockRect(&rect, NULL, 0);
-
-	for (unsigned long h = 0; h < SVidHeight; h++) {
-		D3DCOLOR * cols = (D3DCOLOR *)((BYTE *)rect.pBits + (h * rect.Pitch));
-		DWORD vidcols = h * SVidWidth;
-
-		for (unsigned long w = 0; w < SVidWidth; w++) {
-			const BYTE index = video_data[vidcols + w];
-
-			cols[w] = D3DCOLOR_XRGB(palette_data[index * 3 + 0], palette_data[index * 3 + 1], palette_data[index * 3 + 2]);
-		}
+	for (DWORD h = 0; h < SVidHeight; h++) {
+		memcpy(&SVidTextureBuffer[h * SVidTexWidth], &video_data[h * SVidWidth], SVidWidth);
 	}
 
-	SVidSurface->UnlockRect();
+	D3DLOCKED_RECT rect;
+	SVidTexture->LockRect(0, &rect, NULL, 0);
+
+	XGSwizzleRect(SVidTextureBuffer, 0, NULL, rect.pBits, SVidTexWidth, SVidTexHeight, NULL, sizeof(BYTE));
+
+	SVidTexture->UnlockRect(0);
+
+	d3dDevice->CreatePalette(D3DPALETTE_256, &SVidPalette);
+
+	d3dDevice->SetTexture(0, SVidTexture);
+	d3dDevice->SetPalette(0, SVidPalette);
 
 	SVidFrameEnd = GetTickCount() * 1000 + SVidFrameLength;
 
@@ -401,27 +181,37 @@ BOOL __cdecl SVidPlayContinue(void)
 	const unsigned char *palette_data = smk_get_palette(SVidSMK);
 	const unsigned char *video_data = smk_get_video(SVidSMK);
 
-	D3DLOCKED_RECT rect;
-	SVidSurface->LockRect(&rect, NULL, 0);
+	if (smk_palette_updated(SVidSMK)) {
+		D3DCOLOR * colors;
 
-	for (unsigned long h = 0; h < SVidHeight; h++) {
-		D3DCOLOR * cols = (D3DCOLOR *)((BYTE *)rect.pBits + h * rect.Pitch);
-		DWORD vidcols = h * SVidWidth;
+		SVidPalette->Lock(&colors, 0);
 
-		for (unsigned long w = 0; w < SVidWidth; w++) {
-			const BYTE index = video_data[vidcols + w];
-
-			cols[w] = D3DCOLOR_XRGB(palette_data[index * 3 + 0], palette_data[index * 3 + 1], palette_data[index * 3 + 2]);
+		for (DWORD i = 0; i < 256; i++) {
+			colors[i] = D3DCOLOR_XRGB(palette_data[i * 3 + 0], palette_data[i * 3 + 1], palette_data[i * 3 + 2]);
 		}
+
+		SVidPalette->Unlock();
+
+		d3dDevice->SetPalette(0, SVidPalette);
 	}
 
-	SVidSurface->UnlockRect();
+	for (DWORD h = 0; h < SVidHeight; h++) {
+		memcpy(&SVidTextureBuffer[h * SVidTexWidth], &video_data[h * SVidWidth], SVidWidth);
+	}
+
+	D3DLOCKED_RECT rect;
+	SVidTexture->LockRect(0, &rect, NULL, 0);
+
+	XGSwizzleRect(SVidTextureBuffer, 0, NULL, rect.pBits, SVidTexWidth, SVidTexHeight, NULL, sizeof(BYTE));
+
+	SVidTexture->UnlockRect(0);
 
 	if (GetTickCount() * 1000 >= SVidFrameEnd) {
 		return SVidLoadNextFrame(); // Skip video and audio if the system is too slow
 	}
 
 	if (FAILED(result = deviceId->SetBufferData((LPVOID)smk_get_audio(SVidSMK, 0), smk_get_audio_size(SVidSMK, 0)))) {
+		DebugPrintf("deviceId->SetBufferData: 0x%08X\n", result);
 		// TODO: log error
 
 		return FALSE;
@@ -451,12 +241,15 @@ BOOL __cdecl SVidPlayContinue(void)
 
 	d3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFF000000, 1.0f, 0);
 
-	IDirect3DSurface8 * surface;
-	d3dDevice->GetBackBuffer(0, 0, &surface);
+	CUSTOMVERTEX verts[] = {
+		{ ((640 - scaledW) / 2) - 0.5f, ((480 - scaledH) / 2) - 0.5f, 0.5f, 1.0f, 0.0f, 0.0f },
+		{ (((640 - scaledW) / 2) + scaledW) - 0.5f, ((480 - scaledH) / 2) - 0.5f, 0.5f, 1.0f, 0.625f, 0.0f },
+		{ (((640 - scaledW) / 2) + scaledW) - 0.5f, (((480 - scaledH) / 2) + scaledH) - 0.5f, 0.5f, 1.0f, 0.625f, 0.609375f },
+		{ ((640 - scaledW) / 2) - 0.5f, (((480 - scaledH) / 2) + scaledH) - 0.5f, 0.5f, 1.0f, 0.0f, 0.609375f }
+	};
 
-	LowerBlitScaled(SVidSurface, NULL, surface, &pal_surface_offset);
-
-	surface->Release();
+	d3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, verts, sizeof(CUSTOMVERTEX));
 
 	d3dDevice->Present(NULL, NULL, NULL, NULL);
 
@@ -470,6 +263,8 @@ BOOL __cdecl SVidPlayContinue(void)
 
 BOOL STORMAPI SVidPlayEnd(HANDLE video)
 {
+	DebugPrintf("SVidPlayEnd(0x%p)\n", video);
+
 	if (!video) {
 		SErrSetLastError(ERROR_INVALID_PARAMETER);
 
@@ -477,6 +272,8 @@ BOOL STORMAPI SVidPlayEnd(HANDLE video)
 	}
 
 	if (deviceId) {
+		deviceId->StopEx(0, DSBSTOPEX_IMMEDIATE);
+		deviceId->SetBufferData(NULL, 0);
 		deviceId->Release();
 		deviceId = NULL;
 	}
@@ -491,18 +288,27 @@ BOOL STORMAPI SVidPlayEnd(HANDLE video)
 		SVidBuffer = NULL;
 	}
 
-	SVidSurface->Release();
+	if (SVidTextureBuffer) {
+		SMemFree(SVidTextureBuffer, "P:\\Projects\\Storm\\Storm-SWAR\\Source\\SVid.cpp", __LINE__, 0);
+
+		SVidTextureBuffer = NULL;
+	}
+
+	d3dDevice->SetTexture(0, NULL);
+	SVidTexture->Release();
+	d3dDevice->SetPalette(0, NULL);
+	SVidPalette->Release();
 
 	SFileCloseFile(video);
 	video = NULL;
-
-	// TODO: implement
 
 	return TRUE;
 }
 
 BOOL STORMAPI SVidDestroy()
 {
+	DebugPrintf("SVidDestroy()\n");
+
 	dsound = NULL;
 
 	// TODO: implement
@@ -512,6 +318,13 @@ BOOL STORMAPI SVidDestroy()
 
 BOOL STORMAPI SVidGetSize(HANDLE video, int *width, int *height, int *zero)
 {
+	DebugPrintf(
+		"SVidGetSize(0x%p, 0x%p, 0x%p, 0x%p)\n",
+		video,
+		width,
+		height,
+		zero);
+
 	if (width) {
 		*width = 0;
 	}
@@ -537,6 +350,8 @@ BOOL STORMAPI SVidGetSize(HANDLE video, int *width, int *height, int *zero)
 
 BOOL STORMAPI SVidInitialize(HANDLE directsound)
 {
+	DebugPrintf("SVidInitialize(0x%p)\n", directsound);
+
 	dsound = (LPDIRECTSOUND)directsound;
 
 	// TODO: implement
@@ -546,6 +361,12 @@ BOOL STORMAPI SVidInitialize(HANDLE directsound)
 
 BOOL STORMAPI SVidPlayContinueSingle(HANDLE video, int a2, int * a3)
 {
+	DebugPrintf(
+		"SVidPlayContinueSingle(0x%p, %i, 0x%p)\n",
+		video,
+		a2,
+		a3);
+
 	if (a3 != NULL) {
 		*a3 = 0;
 	}
