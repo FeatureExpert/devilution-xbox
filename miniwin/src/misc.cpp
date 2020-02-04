@@ -5,6 +5,7 @@
 #include <ShlObj.h>
 #include <ShellAPI.h>
 #include <TChar.h>
+#include <xbdm.h>
 
 #include <assert.h>
 
@@ -278,8 +279,7 @@ WINBASEAPI BOOL WINAPI FreeResource(IN HGLOBAL hResData)
 
 WINBASEAPI BOOL WINAPI GetComputerNameA(OUT LPSTR lpBuffer, IN OUT LPDWORD nSize)
 {
-	// TODO: implement
-	return FALSE;
+	return DmGetXboxName(lpBuffer, nSize) == XBDM_NOERR;
 }
 
 WINBASEAPI BOOL WINAPI GetComputerNameW(OUT LPWSTR lpBuffer, IN OUT LPDWORD nSize)
