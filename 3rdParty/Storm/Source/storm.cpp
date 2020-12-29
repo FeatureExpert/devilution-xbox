@@ -98,16 +98,6 @@ void STORMAPI SErrSetLastError(DWORD dwErrCode) rVoid;
 
 void STORMAPI SErrSuppressErrors(BOOL suppressErrors) rVoid;
 
-int   STORMAPI SStrCopy(char *dest, const char *src, int max_length) rInt;
-DWORD STORMAPI SStrHash(const char *string, DWORD flags, DWORD Seed) rInt;
-int   STORMAPI SStrPack(char *dest, const char *src, DWORD max_length) rInt;
-
-int STORMAPI SStrLen(const char* string) rInt;
-
-int STORMAPI SStrCmp(const char *string1, const char *string2, size_t size) rInt;
-int STORMAPI SStrCmpI(const char *string1, const char *string2, size_t size) rInt;
-char* STORMAPI SStrUpper(char* string) rPVoid;
-
 void STORMAPI SRgn523(HANDLE hRgn, RECT *pRect, int a3, int a4) rVoid;
 void STORMAPI SRgnCreateRegion(HANDLE *hRgn, int a2) rVoid;
 void STORMAPI SRgnDeleteRegion(HANDLE hRgn) rVoid;
@@ -117,11 +107,6 @@ void STORMAPI SRgn529i(int handle, int a2, int a3) rVoid;
 BOOL SErrDisplayErrorFmt(DWORD dwErrMsg, const char *logfilename, int logline, BOOL allowOption, int exitCode, const char *format, ...) rBool;
 
 void STORMAPI SErrCatchUnhandledExceptions() rVoid;
-
-char* STORMAPI SStrChr(const char *string, char c) rPVoid;
-char* STORMAPI SStrChrR(const char *string, char c) rPVoid;
-
-size_t SStrVPrintf(char *dest, size_t size, const char *format, ...) rInt;
 
 int STORMAPI SBigDel(void *buffer) rInt;
 

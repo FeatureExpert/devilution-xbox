@@ -86,106 +86,106 @@ BOOL __stdcall UiArtCallback(int game_type, unsigned int art_code, PALETTEENTRY 
 		if (art_code > 0x80000004) {
 			switch (art_code) {
 			case 0x80000005:
-				SStrPack(pszFileName, "bnconnbg.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "bnconnbg.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x80000006:
-				SStrPack(pszFileName, "bnselchn.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "bnselchn.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x80000007:
-				SStrPack(pszFileName, "bnlogin.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "bnlogin.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x80000008:
-				SStrPack(pszFileName, "newaccount.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "newaccount.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x80000009:
-				SStrPack(pszFileName, "changepassword.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "changepassword.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x8000000A:
-				SStrPack(pszFileName, "bnladder.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "bnladder.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x8000000B:
-				SStrPack(pszFileName, "badconn.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "badconn.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x8000000C:
-				SStrPack(pszFileName, "welcome.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "welcome.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x8000000D:
-				SStrPack(pszFileName, "lepopup.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "lepopup.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			case 0x8000000E:
-				SStrPack(pszFileName, "tos.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "tos.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			}
 		} else {
 			if (art_code == 0x80000004) {
-				SStrPack(pszFileName, "redlag.pcx", sizeof(pszFileName));
+				SStrNCat(pszFileName, "redlag.pcx", sizeof(pszFileName));
 				return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 			}
 			if (art_code > 7) {
 				switch (art_code) {
 				case 8u:
 				LABEL_48:
-					SStrPack(pszFileName, "but_lrg.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "but_lrg.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 0x80000000:
-					SStrPack(pszFileName, "bnbuttns.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "bnbuttns.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 0x80000001:
-					SStrPack(pszFileName, "chat_bkg.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "chat_bkg.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 0x80000002:
-					SStrPack(pszFileName, "greenlag.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "greenlag.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 0x80000003:
-					SStrPack(pszFileName, "yellolag.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "yellolag.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				}
 			} else {
 				switch (art_code) {
 				case 7u:
 				LABEL_47:
-					SStrPack(pszFileName, "but_med.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "but_med.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 0u:
-					SStrPack(pszFileName, "bn_bkg.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "bn_bkg.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 2u:
-					SStrPack(pszFileName, "bnjoinbg.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "bnjoinbg.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 3u:
-					SStrPack(pszFileName, "hpopup.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "hpopup.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 5u:
 				LABEL_46:
-					SStrPack(pszFileName, "but_xsm.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "but_xsm.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				case 6u:
 				LABEL_11:
-					SStrPack(pszFileName, "but_sml.pcx", sizeof(pszFileName));
+					SStrNCat(pszFileName, "but_sml.pcx", sizeof(pszFileName));
 					return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 				}
 			}
 		}
 	} else if (game_type == 'IPXN') {
 		if (!art_code) {
-			SStrPack(pszFileName, "ipx_bkg.pcx", sizeof(pszFileName));
+			SStrNCat(pszFileName, "ipx_bkg.pcx", sizeof(pszFileName));
 			return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 		}
 	} else if (!game_type && !art_code) {
-		SStrPack(pszFileName, "connect.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "connect.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	}
 	switch (art_code) {
 	case 0u:
 	case 2u:
-		SStrPack(pszFileName, "menu.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "menu.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 1u:
 	case 8u:
 		goto LABEL_48;
 	case 3u:
 	case 4u:
-		SStrPack(pszFileName, "lpopup.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "lpopup.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 5u:
 		goto LABEL_46;
@@ -194,76 +194,76 @@ BOOL __stdcall UiArtCallback(int game_type, unsigned int art_code, PALETTEENTRY 
 	case 7u:
 		goto LABEL_47;
 	case 9u:
-		SStrPack(pszFileName, "xsmlogo.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "xsmlogo.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xAu:
-		SStrPack(pszFileName, "prog_bg.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "prog_bg.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xBu:
-		SStrPack(pszFileName, "prog_fil.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "prog_fil.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xCu:
-		SStrPack(pszFileName, "spopup.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "spopup.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xDu:
-		SStrPack(pszFileName, "scrlarrw.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "scrlarrw.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xEu:
-		SStrPack(pszFileName, "scrlthmb.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "scrlthmb.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0xFu:
-		SStrPack(pszFileName, "scrlbar.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "scrlbar.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x10u:
-		SStrPack(pszFileName, "cmel.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmel.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x11u:
-		SStrPack(pszFileName, "cmml.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmml.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x12u:
-		SStrPack(pszFileName, "cmbl.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmbl.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x13u:
-		SStrPack(pszFileName, "cmec.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmec.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x14u:
-		SStrPack(pszFileName, "cmmc.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmmc.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x15u:
-		SStrPack(pszFileName, "cmbc.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmbc.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x16u:
-		SStrPack(pszFileName, "cmer.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmer.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x17u:
-		SStrPack(pszFileName, "cmmr.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmmr.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x18u:
-		SStrPack(pszFileName, "cmbr.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "cmbr.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x19u:
-		SStrPack(pszFileName, "slgray.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slgray.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x1Au:
-		SStrPack(pszFileName, "slthumb.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slthumb.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x1Bu:
-		SStrPack(pszFileName, "slfocus.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slfocus.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x1Cu:
-		SStrPack(pszFileName, "slleft.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slleft.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x1Du:
-		SStrPack(pszFileName, "slmiddle.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slmiddle.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x1Eu:
-		SStrPack(pszFileName, "slright.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "slright.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x20u:
-		SStrPack(pszFileName, "but_checkoff.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "but_checkoff.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	case 0x21u:
-		SStrPack(pszFileName, "but_checkon.pcx", sizeof(pszFileName));
+		SStrNCat(pszFileName, "but_checkon.pcx", sizeof(pszFileName));
 		return SBmpLoadImage(pszFileName, pPalette, pBuffer, dwBuffersize, pdwWidth, pdwHeight, pdwBpp);
 	default:
 		result = 0;

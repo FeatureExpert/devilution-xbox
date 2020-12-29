@@ -211,6 +211,9 @@
 				RelativePath=".\SReg.cpp">
 			</File>
 			<File
+				RelativePath=".\SStr.cpp">
+			</File>
+			<File
 				RelativePath=".\storm.cpp">
 			</File>
 			<File
